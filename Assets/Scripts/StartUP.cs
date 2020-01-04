@@ -5,9 +5,11 @@ using UnityEngine.UI;
 
 public class StartUP : MonoBehaviour
 {
+    #region Canvas
     [SerializeField]
     [Tooltip("包含开始界面的Canvas，\n应包括：命名为ImageBackGround的背景图，以及以Button开头的按钮，\n且按钮至少包括：ButtonStart，ButtonExit二者，每次更新时需要重写StarUP")]
-    public Canvas StartUPCanvas;
+    private Canvas StartUPCanvas;
+    #endregion
 
     void Start()
     {
@@ -20,12 +22,14 @@ public class StartUP : MonoBehaviour
         ExitButton.onClick.AddListener(OnExitButtonClicked);
     }
 
+    #region Implementation
     private void OnStartButtonClicked()
     {
-        GameManager.Instance.LoadScene(GameManager.MainSceneName);
+        GameManager.GameStart();
     }
     private void OnExitButtonClicked()
     {
-        GameManager.Instance.ExitGame();
+        GameManager.ExitGame();
     }
+    #endregion
 }

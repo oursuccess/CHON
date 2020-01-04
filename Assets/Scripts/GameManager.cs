@@ -19,7 +19,6 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
     #endregion
-    #region Mono
     void Awake()
     {
         Singleton();
@@ -32,23 +31,41 @@ public class GameManager : MonoBehaviour
     {
 
     }
-    #endregion
     #region LevelManager
-    public LevelManager LevelManager { get; private set; }
+    #region Implematetion
+    private LevelManager LevelManager;
     private void InitLevelManager()
     {
         LevelManager = gameObject.AddComponent<LevelManager>();
     }
+    #endregion
     #region Interface
-    public void LoadScene(string levelName)
+    public int LevelNum
     {
-        LevelManager.LoadScene(levelName);
+        get
+        {
+            return LevelManager.FinalLevel;
+        }
     }
-    public void ExitGame()
+    public static void LoadLevel(int levelNum)
     {
-        LevelManager.ExitGame();
+        Instance.LevelManager.LoadLevel(levelNum);
     }
     #endregion
+    #endregion
+    #region Camera
+    public float ScreenWidth { get { return Screen.width; } }
+    public float ScreenHeight { get { return Screen.height; } }
+    #endregion
+    #region Scene 
+    public static void GameStart()
+    {
+        Instance.LevelManager.ToSceneSelector();
+    }
+    public static void ExitGame()
+    {
+        Instance.LevelManager.ExitGame();
+    }
     #endregion
     #region GameState
     #region GameOver
@@ -61,10 +78,5 @@ public class GameManager : MonoBehaviour
 
     }
     #endregion
-    #endregion
-    #region SceneName
-    //Scene更新后需要更新
-    public static string StartUPSceneName = "StartUP";
-    public static string MainSceneName = "Main";
     #endregion
 }
