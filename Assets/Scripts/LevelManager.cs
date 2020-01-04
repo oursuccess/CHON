@@ -1,42 +1,20 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
-    void Start()
-    {
-        InitLevels();
-        InitBoardManager();
-    }
-    #region Scene
-    public void ToSceneSelector()
-    {
-        SceneManager.LoadScene(LevelSelectorName);
-    }
-    public void ExitGame()
-    {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
-    }
-    #endregion
-    #region Level
-    public void LoadLevel(int level)
-    {
-    }
     #region Init
     #region Levels
     private void InitLevels()
     {
         Levels = Resources.LoadAll<TextAsset>(LevelDictionaryName);
 #if UNITY_EDITOR
-        foreach(var level in Levels)
+        foreach (var level in Levels)
         {
-            if(!int.TryParse(level.name, out int levelNum))
+            if (!int.TryParse(level.name, out int levelNum))
             {
                 Debug.Log("发现了不支持的关卡文件\n" + level.name);
             }
@@ -48,13 +26,58 @@ public class LevelManager : MonoBehaviour
     public TextAsset[] Levels { get; private set; }
     #endregion
     #region BoardManager
-    public BoardManager BoardManager { get; private set; }
+    private BoardManager BoardManager;
     public void InitBoardManager()
     {
         BoardManager = gameObject.AddComponent<BoardManager>();
     }
     #endregion
     #endregion
+    void Start()
+    {
+        InitLevels();
+        InitBoardManager();
+    }
+    #region Scene
+    public void ToSceneSelector()
+    {
+        SceneManager.LoadScene(LevelSelectorName);
+    }
+    private void ToMainScene()
+    {
+        SceneManager.LoadScene(MainSceneName);
+    }
+    public void ExitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+    #endregion
+    #region Level
+    public int currLevel {get; private set;}
+    public void LoadLevel(int level)
+    {
+        currLevel = level;
+        ToMainScene();
+        SceneManager.sceneLoaded += OnMainSceneLoaded;
+    }
+
+    private void OnMainSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        string levelName = currLevel.ToString().PadLeft(3, '0');
+        BoardManager.SetLevelBoard(LoadLevelConfigFromText(levelName));
+        SceneManager.sceneLoaded -= OnMainSceneLoaded;
+    }
+
+    private LevelConfig LoadLevelConfigFromText(string levelName)
+    {
+        var levelText = Resources.Load(LevelDictionaryName + "/" + levelName) as TextAsset;
+        LevelConfig levelConfig = new LevelConfig(levelText.text);
+        return levelConfig;
+    }
     #region KeepInDate
     #region SceneName
     //Scene名称变化或增加后需要更新
