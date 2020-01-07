@@ -6,13 +6,13 @@ using TMPro;
 
 public class Element : MonoBehaviour
 {
-    enum ElementType
+    public enum ElementType
     {
         normal,
         goal,
         obstacle,
     }
-    private ElementType type;
+    public ElementType type;
     public class Position
     {
         public int xPos;
@@ -73,21 +73,4 @@ public class Element : MonoBehaviour
     {
         positionInGrid = new Position(xPos, yPos);
     }
-
-    public void Move(Vector2 direction)
-    {
-        if(type == ElementType.normal)
-        {
-            UpdatePosition(direction);
-        }
-    }
-
-    private void UpdatePosition(Vector2 position)
-    {
-        positionInGrid.UpdatePosition((int)position.x, (int)position.y);
-        transform.position += (Vector3)position;
-        OnPositionUpdated?.Invoke(this);
-    }
-    public delegate void PositionUpdatedDel(Element element);
-    public event PositionUpdatedDel OnPositionUpdated;
 }
