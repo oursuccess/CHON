@@ -68,4 +68,9 @@ public class Element : MonoBehaviour
     {
         positionInGrid = new Position(xPos, yPos);
     }
+
+    public void Move(Vector2 direction)
+    {
+
+    }
 }

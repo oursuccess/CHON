@@ -64,6 +64,10 @@ public class BoardManager : MonoBehaviour
     }
     public void Move(Vector2 direction)
     {
+        foreach(var element in elements)
+        {
+            element.Move(direction);
+        }
     }
     #endregion
 }
