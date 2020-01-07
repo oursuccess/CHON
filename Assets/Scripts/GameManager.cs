@@ -27,10 +27,6 @@ public class GameManager : MonoBehaviour
     void Start()
     {
     }
-    void Update()
-    {
-
-    }
     #region LevelManager
     #region Implematetion
     private LevelManager LevelManager;

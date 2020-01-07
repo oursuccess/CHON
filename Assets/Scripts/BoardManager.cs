@@ -6,6 +6,7 @@ public class BoardManager : MonoBehaviour
 {
     private List<List<string>> boards;
     private List<List<GameObject>> grids;
+    private List<List<Element>> gridUsing;
     private List<Element> elements;
     private GameObject gridPrefab;
     private GameObject elementPrefab;
@@ -19,6 +20,7 @@ public class BoardManager : MonoBehaviour
     {
         grids = new List<List<GameObject>>();
         elements = new List<Element>();
+        gridUsing = new List<List<Element>>();
     }
     #endregion
     #region Interface
@@ -30,6 +32,16 @@ public class BoardManager : MonoBehaviour
         BoardsObject.name = "Boards";
         int ySize = boards.Count;
         int xSize = boards[0].Count;
+
+        for(var y = 0; y < ySize; ++y)
+        {
+            List<Element> gridUsingCol = new List<Element>();
+            for(var x = 0; x < xSize; ++x)
+            {
+                gridUsingCol.Add(null);
+            }
+            gridUsing.Add(gridUsingCol);
+        }
 
         var xBegin = (Camera.main.ScreenToWorldPoint(new Vector2(GameManager.Instance.ScreenWidth / 2, 0)).x - xSize) / 2;
         var yBegin = (Camera.main.ScreenToWorldPoint(new Vector2(0, GameManager.Instance.ScreenHeight / 2)).y + ySize) / 2;
@@ -51,22 +63,52 @@ public class BoardManager : MonoBehaviour
                     if (!element.shouldRemove)
                     {
                         element.InitPosition(x, y);
+                        element.OnPositionUpdated += OnGridPositionChanged;
                         elements.Add(element);
+                        gridUsing[y][x] = element;
                     }
                 }
             }
             grids.Add(gridCol);
+
+            canMove = true;
         }
     }
     public void RemoveElement(Element element)
     {
+        gridUsing[element.positionInGrid.yPos][element.positionInGrid.xPos] = null;
+        element.OnPositionUpdated -= OnGridPositionChanged;
         elements.Remove(element);
     }
+    #region Move
+    bool canMove;
     public void Move(Vector2 direction)
     {
-        foreach(var element in elements)
+        canMove = false;
+        for(var i = 0; i < gridUsing.Count; ++i)
         {
-            element.Move(direction);
+            for(var j = 0; j < gridUsing[0].Count; ++j)
+            {
+                gridUsing[i][j]?.Move(direction);
+            }
+        }
+        canMove = true;
+    }
+    private void OnGridPositionChanged(Element element)
+    {
+        gridUsing[element.positionInGrid.yPos][element.positionInGrid.xPos] = element;
+    }
+    #endregion
+    void Update()
+    {
+        if (canMove)
+        {
+            float x = Input.GetAxisRaw("Horizontal");
+            float y = Input.GetAxisRaw("Vertical");
+            if ((x != 0 || y != 0) && !(x != 0 && y != 0))
+            {
+                Move(new Vector2(x, y));
+            }
         }
     }
     #endregion

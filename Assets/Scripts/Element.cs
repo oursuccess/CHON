@@ -22,6 +22,11 @@ public class Element : MonoBehaviour
             xPos = x;
             yPos = y;
         }
+        public void UpdatePosition(int xChange, int yChange)
+        {
+            xPos += xChange;
+            yPos += yChange;
+        }
     }
     public bool shouldRemove { get; private set; } = false;
     public Position positionInGrid { get; private set; }
@@ -71,6 +76,18 @@ public class Element : MonoBehaviour
 
     public void Move(Vector2 direction)
     {
-
+        if(type == ElementType.normal)
+        {
+            UpdatePosition(direction);
+        }
     }
+
+    private void UpdatePosition(Vector2 position)
+    {
+        positionInGrid.UpdatePosition((int)position.x, (int)position.y);
+        transform.position += (Vector3)position;
+        OnPositionUpdated?.Invoke(this);
+    }
+    public delegate void PositionUpdatedDel(Element element);
+    public event PositionUpdatedDel OnPositionUpdated;
 }
