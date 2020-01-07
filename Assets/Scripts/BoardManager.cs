@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class BoardManager : MonoBehaviour
@@ -45,12 +46,19 @@ public class BoardManager : MonoBehaviour
 
                 var element = Instantiate(elementPrefab, new Vector2(xBegin + x, yBegin - y), Quaternion.identity, BoardsObject.transform);
                 element.name = "Element" + "X" + x + "Y" + y;
-                var elementText = element.transform.Find("Text").gameObject.GetComponent<TextMesh>();
-                elementText.text = boards[y][x];
+                var elementText = element.transform.Find("Text").gameObject.GetComponent<TextMeshPro>();
+                elementText.text = InitElementFromText(boards[y][x]);
                 elementCol.Add(element);
             }
             grids.Add(gridCol);
         }
     }
     #endregion
+
+    private string InitElementFromText(string text)
+    {
+        string element = text;
+
+        return text;
+    }
 }
