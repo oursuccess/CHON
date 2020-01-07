@@ -1,13 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 public class BoardManager : MonoBehaviour
 {
     private List<List<string>> boards;
     private List<List<GameObject>> grids;
-    private List<List<GameObject>> elements;
+    private List<Element> elements;
     private GameObject gridPrefab;
     private GameObject elementPrefab;
     void Start()
@@ -19,7 +18,7 @@ public class BoardManager : MonoBehaviour
     private void ResetCurrBoard()
     {
         grids = new List<List<GameObject>>();
-        elements = new List<List<GameObject>>();
+        elements = new List<Element>();
     }
     #endregion
     #region Interface
@@ -37,28 +36,34 @@ public class BoardManager : MonoBehaviour
         for(var y = 0; y < ySize; ++y)
         {
             List<GameObject> gridCol = new List<GameObject>();
-            List<GameObject> elementCol = new List<GameObject>();
             for(var x = 0; x < xSize; ++x)
             {
-                var grid = Instantiate(gridPrefab, new Vector2(xBegin + x, yBegin - y), Quaternion.identity, BoardsObject.transform);
-                grid.name = "Grid" + "X" + x + "Y" + y;
-                gridCol.Add(grid);
+                var gridObj = Instantiate(gridPrefab, new Vector2(xBegin + x, yBegin - y), Quaternion.identity, BoardsObject.transform);
+                gridObj.name = "Grid" + "X" + x + "Y" + y;
+                gridCol.Add(gridObj);
 
-                var element = Instantiate(elementPrefab, new Vector2(xBegin + x, yBegin - y), Quaternion.identity, BoardsObject.transform);
-                element.name = "Element" + "X" + x + "Y" + y;
-                var elementText = element.transform.Find("Text").gameObject.GetComponent<TextMeshPro>();
-                elementText.text = InitElementFromText(boards[y][x]);
-                elementCol.Add(element);
+                if (!string.IsNullOrWhiteSpace(boards[y][x]))
+                {
+                    var elementObj = Instantiate(elementPrefab, new Vector2(xBegin + x, yBegin - y), Quaternion.identity, BoardsObject.transform);
+                    elementObj.name = "Element" + "X" + x + "Y" + y;
+                    var element = elementObj.AddComponent<Element>();
+                    element.InitElementFromText(boards[y][x]);
+                    if (!element.shouldRemove)
+                    {
+                        element.InitPosition(x, y);
+                        elements.Add(element);
+                    }
+                }
             }
             grids.Add(gridCol);
         }
     }
-    #endregion
-
-    private string InitElementFromText(string text)
+    public void RemoveElement(Element element)
     {
-        string element = text;
-
-        return text;
+        elements.Remove(element);
     }
+    public void Move(Vector2 direction)
+    {
+    }
+    #endregion
 }
